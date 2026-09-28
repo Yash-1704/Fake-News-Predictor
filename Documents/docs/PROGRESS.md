@@ -58,3 +58,5 @@ Update after each phase. An agent must find the first unchecked phase here.
 - All five requested manual cases passed; the clean-room model-card metrics match the working model card exactly.
 - The temporary clean-room folder and its generated artifacts were removed; next phase is Phase 9.
 - Human: add your own Phase 8 entry to `Documents/docs/LEARNING_LOG.md`.
+
+- Phase 9 drafting checkpoint: README, report notes, blank viva prompts, demo script, 12-slide outline, and figure assets are prepared; links, report metrics, Python tests, and frontend build verified. Phase 9 remains open for the human's viva answers and two independent demo runs.
