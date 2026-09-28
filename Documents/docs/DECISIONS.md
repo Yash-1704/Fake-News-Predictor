@@ -8,3 +8,5 @@ Format: date | decision | reason | alternatives.
 | start | One sklearn Pipeline saved as one file | Prevents train/serve mismatch and test leakage | Separate vectorizer.joblib and model.joblib |
 | start | FAKE=1, REAL=0 | Fake is the class of interest | none |
 | start | Expose `fake_score`, not "confidence" | Output is an uncalibrated model score | Calibration (extension) |
+| 2026-09-28 | Selected P2_LR (clean_text + TF-IDF unigrams + Logistic Regression) | Highest cross-dataset F1 (69.13%) among leakage-cleaned pipelines, high CV F1 (97.70%), native predict_proba support | P1_LR (has raw text leakage), P2_SVM (no native predict_proba), P2_NB (lower cross-dataset F1 ~63.45%) |
+

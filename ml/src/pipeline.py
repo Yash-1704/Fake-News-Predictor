@@ -19,13 +19,14 @@ def build_baseline() -> Pipeline:
     ])
 
 
-def build_pipeline(clean=True, ngram_range=(1,1), stop_words=None, classifier=None) -> Pipeline:
+def build_pipeline(clean=True, ngram_range=(1,1), stop_words=None, min_df=1, classifier=None) -> Pipeline:
     """Builds NLP classification pipeline with optional custom preprocessing.
     
     Args:
         clean: If True, uses custom clean_text function for preprocessing.
         ngram_range: Tuple for TF-IDF ngram range.
         stop_words: String or list for TF-IDF stop words.
+        min_df: Minimum document frequency for TF-IDF vectorizer.
         classifier: Sklearn estimator. If None, defaults to LogisticRegression.
     """
     preprocessor = clean_text if clean else None
@@ -38,7 +39,9 @@ def build_pipeline(clean=True, ngram_range=(1,1), stop_words=None, classifier=No
             lowercase=True, # Will be ignored if preprocessor is not None since preprocessor lowercases.
             max_features=50_000,
             ngram_range=ngram_range,
-            stop_words=stop_words
+            stop_words=stop_words,
+            min_df=min_df
         )),
         ("clf", clf),
     ])
+
