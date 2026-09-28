@@ -4,7 +4,7 @@ Update after each phase. An agent must find the first unchecked phase here.
 - [x] Phase 0: Setup and skeleton
 - [x] Phase 1: Data
 - [x] Phase 2: Baseline model
-- [ ] Phase 3: Leakage and generalization check
+- [x] Phase 3: Leakage and generalization check
 - [ ] Phase 4: Experiments
 - [ ] Phase 5: Final model and prediction module
 - [ ] Phase 6: Backend API
@@ -19,8 +19,8 @@ Update after each phase. An agent must find the first unchecked phase here.
 | Rows after cleaning | ISOT: 39,100 | Kaggle: 6,305 |
 | Majority-class baseline accuracy | 54.21% |
 | Baseline in-domain F1 | 98.07% |
-| In-domain F1 after leakage cleanup | |
-| Cross-dataset F1 | |
+| In-domain F1 after leakage cleanup | 97.62% |
+| Cross-dataset F1 | 69.13% |
 | Final model | |
 
 ## Notes / blockers
@@ -28,6 +28,7 @@ Update after each phase. An agent must find the first unchecked phase here.
 - Phase 1 complete: Built `ml/src/data.py` (`load_isot()`, `load_second()`, `train_test()`), cleaned and deduplicated ISOT (39,100 rows) & Kaggle Fake/Real (6,305 rows), generated figures and `ml/reports/eda_summary.md` with empirical artifact leakage counts.
 - Phase 2 complete: Trained TF-IDF + LogisticRegression baseline model on ISOT. Reached 98.25% accuracy and 98.07% F1 score (vs 54.21% majority baseline accuracy).
 - Is this 98.07% score believable? No. The unnaturally high score is driven by publisher-specific text artifacts like `(Reuters)` and `"via"` in ISOT text, which Phase 3 will test and strip.
-- Next: Phase 3 (Leakage cleanup and cross-dataset generalization check).
+- Phase 3 complete: Created `clean_text` to strip publisher artifacts (`(Reuters)`, `via`, `featured image`, URLs). Baseline model evaluated on a completely unseen Kaggle dataset dropped from ~98% F1 to ~69% F1, proving the model was relying heavily on spurious correlations and publisher artifacts rather than true language semantics.
+- Next: Phase 4 (Experiments to improve cross-dataset generalization).
 
 
