@@ -1,0 +1,1 @@
+Follow all rules in /AGENTS.md at the repository root. Read AGENTS.md, docs/ARCHITECTURE.md, docs/PROGRESS.md and the current phase file in docs/phases/ before making changes. Work on one phase at a time and never invent metrics.
