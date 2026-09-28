@@ -45,3 +45,14 @@ def build_pipeline(clean=True, ngram_range=(1,1), stop_words=None, min_df=1, cla
         ("clf", clf),
     ])
 
+
+def build_final_pipeline() -> Pipeline:
+    """Builds final NLP classification pipeline (P2_LR) using clean_text preprocessing,
+    TF-IDF unigrams (max_features=50,000), and Logistic Regression.
+    
+    Why: P2_LR achieved top cross-dataset F1 generalization score (69.13%) among leakage-cleaned
+    pipelines, preserves explainability, and natively outputs calibrated class probabilities.
+    """
+    return build_pipeline(clean=True, ngram_range=(1, 1), stop_words=None, min_df=1)
+
+
