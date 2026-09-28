@@ -46,17 +46,19 @@ export function NewsForm({ onSubmit, onClear, isLoading }) {
         onChange={(e) => setText(e.target.value)}
         placeholder="Paste or type a news article here…"
         rows={10}
-        maxLength={MAX_CHARS}
         aria-describedby="char-counter sample-note"
         disabled={isLoading}
       />
       <div className="char-row">
         <span
           id="char-counter"
-          className={`char-counter ${charCount > MAX_CHARS * 0.9 ? 'char-warn' : ''}`}
+          className={`char-counter ${charCount > MAX_CHARS ? 'char-error' : charCount > MAX_CHARS * 0.9 ? 'char-warn' : ''}`}
         >
           {charCount.toLocaleString()} / {MAX_CHARS.toLocaleString()}
         </span>
+        {charCount > MAX_CHARS && (
+          <span className="char-hint char-error">Maximum {MAX_CHARS.toLocaleString()} characters</span>
+        )}
         {trimmedLen > 0 && trimmedLen < MIN_CHARS && (
           <span className="char-hint">Need at least {MIN_CHARS} characters</span>
         )}

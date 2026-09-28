@@ -1,3 +1,4 @@
+import time
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
@@ -7,6 +8,13 @@ from backend.schemas import PredictRequest, PredictResponse
 
 DISCLAIMER = "Automated model prediction based on writing patterns; not a fact-check."
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
+logger = logging.getLogger("backend")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,8 +23,10 @@ async def lifespan(app: FastAPI):
     """
     try:
         app.state.predictor = Predictor.load()
+        logger.info("Successfully loaded Predictor artifact.")
     except FileNotFoundError:
         app.state.predictor = None
+        logger.warning("Predictor artifact not found at startup.")
     yield
 
 
@@ -29,6 +39,21 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],
 )
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """Middleware logging request path, HTTP method, status code, and latency.
+
+    Why: Keeps server access logs clean and privacy-compliant by explicitly NOT logging input article text.
+    """
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = (time.time() - start_time) * 1000  # in ms
+    logger.info(
+        f"path={request.url.path} method={request.method} status={response.status_code} latency={process_time:.2f}ms"
+    )
+    return response
 
 
 def get_predictor(request: Request) -> Predictor:
@@ -54,7 +79,7 @@ def model_info(request: Request):
 @app.post("/predict", response_model=PredictResponse)
 def predict(body: PredictRequest, request: Request):
     """Predicts fake news score and label for input text.
-    
+
     Why: Uses a plain def function so FastAPI automatically delegates ML inference execution
     to an asynchronous threadpool, ensuring CPU-bound tokenization/classification does not block
     the main event loop.
@@ -63,6 +88,6 @@ def predict(body: PredictRequest, request: Request):
     try:
         result = predictor.predict(body.text)
     except Exception:
-        logging.exception("Prediction failed")
+        logger.exception("Prediction failed")
         raise HTTPException(status_code=500, detail="Prediction failed.")
     return {**result, "disclaimer": DISCLAIMER}

@@ -147,6 +147,7 @@ body {
 }
 
 .char-warn { color: #f59e0b; }
+.char-error { color: #ef4444; }
 
 .char-hint {
   font-size: 0.78rem;
