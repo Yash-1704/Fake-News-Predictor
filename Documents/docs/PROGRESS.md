@@ -9,7 +9,7 @@ Update after each phase. An agent must find the first unchecked phase here.
 - [x] Phase 5: Final model and prediction module
 - [x] Phase 6: Backend API
 
-- [ ] Phase 7: Frontend
+- [x] Phase 7: Frontend
 - [ ] Phase 8: Integration and hardening
 - [ ] Phase 9: Docs, results, viva
 
@@ -33,7 +33,8 @@ Update after each phase. An agent must find the first unchecked phase here.
 - Phase 4 complete: Evaluated 12 preprocessing/classifier combinations on 5-fold CV, held-out test split, and cross-dataset benchmark. `P2_LR` selected as the final model pipeline (Cross-dataset F1: 69.13%, CV F1: 97.70%, Test F1: 97.62%, native `predict_proba`).
 - Phase 5 complete: Added `build_final_pipeline()`, implemented `ml/src/train.py`, serialized `ml/models/pipeline.joblib` and `ml/models/model_card.json`, built `Predictor` class in `ml/src/predict.py`, verified with unit and subprocess tests in `tests/test_predict.py` (5/5 passed).
 - Phase 6 complete: Implemented FastAPI backend service (`backend/main.py`, `backend/schemas.py`, `backend/README.md`) with `/health`, `/model-info`, `/predict`, CORS, lifespan model loading, Pydantic validation, and comprehensive tests in `tests/test_api.py` (16/16 total repo tests passed).
-- Next: Phase 7 (Frontend React application).
+- Phase 7 complete: Scaffolded React + Vite frontend (`frontend/`), added `/api` proxy to Vite config, implemented `api.js`, `NewsForm`, `ResultCard`, `ErrorBanner`, and `About` components. Premium dark-theme CSS. `npm run build` passes (227 kB JS, 6.7 kB CSS). API proxy verified via curl.
+- Next: Phase 8 (Integration and hardening).
 
 
 
