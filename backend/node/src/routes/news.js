@@ -6,11 +6,12 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const topic = String(req.query.topic || "").trim();
+  const itemLimit = req.user ? 20 : 5;
 
   try {
     const cachedItems = await NewsItem.find(topic ? { topic: { $regex: new RegExp(topic, "i") } } : {})
       .sort({ publishedAt: -1 })
-      .limit(20)
+      .limit(itemLimit)
       .lean();
 
     if (!topic) {
@@ -45,7 +46,11 @@ router.get("/", async (req, res) => {
         savedItems.push(item.toObject ? item.toObject() : item);
       }
 
-      return res.json({ items: savedItems.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)).slice(0, 20) });
+      return res.json({
+        items: savedItems
+          .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+          .slice(0, itemLimit),
+      });
     } catch (gnewsError) {
       console.error("Topic-specific GNews lookup failed:", gnewsError.message);
       return res.json({ items: cachedItems });

@@ -1,6 +1,6 @@
 {
-  "model_version": "2026-09-28-lr-v1",
-  "trained_at": "2026-09-28T11:29:12.533454+00:00",
+  "model_version": "2026-09-30-lr-v1",
+  "trained_at": "2026-09-30T14:33:05.106324+00:00",
   "dataset": "ISOT Fake News Dataset (with Kaggle Fake/Real evaluation)",
   "n_train": 31280,
   "n_test": 7820,

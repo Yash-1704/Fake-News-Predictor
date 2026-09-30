@@ -1,5 +1,7 @@
-export function FactCheckPanel({ articleText, result, loading, onFactCheck, user }) {
-  const canUse = Boolean(user) && typeof articleText === 'string' && articleText.trim().length > 0;
+import { ArrowUpRight, LockKeyhole, Sparkles } from 'lucide-react';
+
+export function FactCheckPanel({ articleText, result, loading, onFactCheck, onRequestLogin, user }) {
+  const hasText = typeof articleText === 'string' && articleText.trim().length > 0;
   const verdictClass = {
     'likely true': 'fact-check-positive',
     'likely false': 'fact-check-negative',
@@ -8,25 +10,25 @@ export function FactCheckPanel({ articleText, result, loading, onFactCheck, user
   }[String(result?.verdict || '').toLowerCase()] || 'fact-check-neutral';
 
   return (
-    <section className="fact-check-panel" aria-live="polite">
+    <section className="fact-check-panel" aria-live="polite" aria-labelledby="fact-check-title">
       <div className="fact-check-header">
-        <h3>Fact-check</h3>
+        <div className="fact-check-title-wrap"><span className="fact-check-icon"><Sparkles size={16} /></span><div><span className="section-kicker">LIMITED CONTEXT</span><h3 id="fact-check-title">AI fact-check</h3></div></div>
         <button
           type="button"
-          className="btn btn-primary"
-          onClick={onFactCheck}
-          disabled={!canUse || loading}
-          title={user ? 'Fact-check this article' : 'Log in to fact-check'}
+          className="button button-outline"
+          onClick={user ? onFactCheck : onRequestLogin}
+          disabled={!hasText || loading}
+          title={user ? 'Compare with available related news context' : 'Sign in to use AI fact-checking'}
         >
-          {user ? (loading ? 'Checking…' : 'Fact-check this') : 'Log in to fact-check'}
+          {user ? (loading ? 'Checking…' : '✦ Fact-check article') : <><LockKeyhole size={15} /> Sign in to fact-check</>}
         </button>
       </div>
 
       {!user && (
-        <p className="fact-check-hint">Log in to access the fact-check feature and compare the article against cached news context.</p>
+        <p className="fact-check-hint">Sign in to use AI-powered fact-checking. Your article stays here while you sign in.</p>
       )}
 
-      {loading && <p className="fact-check-status">Checking article against recent news items…</p>}
+      {loading && <p className="fact-check-status" role="status"><span className="loading-pulse" /> Checking against limited related-news context…</p>}
 
       {result && (
         <div className="fact-check-result">
@@ -46,12 +48,7 @@ export function FactCheckPanel({ articleText, result, loading, onFactCheck, user
                 {result.sources.map((source, index) => (
                   <li key={`${source.url || source.title || index}-${index}`}>
                     <strong>{source.title || 'News source'}</strong> — {source.source || 'Unknown source'}
-                    {source.url ? (
-                      <>
-                        {' '}
-                        <a href={source.url} target="_blank" rel="noreferrer">Read</a>
-                      </>
-                    ) : null}
+                    {source.url ? <a href={source.url} target="_blank" rel="noreferrer" aria-label={`Read source: ${source.title || source.source || 'news article'}`}><ArrowUpRight size={14} /> Source</a> : null}
                   </li>
                 ))}
               </ul>
@@ -60,7 +57,7 @@ export function FactCheckPanel({ articleText, result, loading, onFactCheck, user
             <p className="fact-check-empty">No related sources were returned for this check.</p>
           )}
 
-          <p className="disclaimer-text">⚠ Automated assessment based on limited retrieved sources, not a guarantee.</p>
+          <p className="fact-check-disclaimer">AI-generated assessment based on limited retrieved sources. It is not a guarantee or a substitute for checking primary sources.</p>
         </div>
       )}
     </section>

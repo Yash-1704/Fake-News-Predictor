@@ -22,7 +22,7 @@ export function NewsForm({ onSubmit, onClear, isLoading }) {
   const [text, setText] = useState('');
   const charCount = text.length;
   const trimmedLen = text.trim().length;
-  const canSubmit = !isLoading && trimmedLen >= MIN_CHARS && charCount <= MAX_CHARS;
+  const canSubmit = !isLoading && trimmedLen >= MIN_CHARS && trimmedLen <= MAX_CHARS;
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -35,7 +35,7 @@ export function NewsForm({ onSubmit, onClear, isLoading }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="form-card" aria-label="News article analyser">
+    <form onSubmit={handleSubmit} className="form-card" aria-label="News article analyzer">
       <label htmlFor="news-textarea" className="form-label">
         Paste a news article to analyse
       </label>
@@ -44,9 +44,10 @@ export function NewsForm({ onSubmit, onClear, isLoading }) {
         className="news-textarea"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Paste or type a news article here…"
+        maxLength={MAX_CHARS + 1}
+        placeholder="Paste the full article text here. More context gives the model more language to analyze."
         rows={10}
-        aria-describedby="char-counter sample-note"
+        aria-describedby="char-counter length-guidance sample-note"
         disabled={isLoading}
       />
       <div className="char-row">
@@ -56,30 +57,27 @@ export function NewsForm({ onSubmit, onClear, isLoading }) {
         >
           {charCount.toLocaleString()} / {MAX_CHARS.toLocaleString()}
         </span>
-        {charCount > MAX_CHARS && (
-          <span className="char-hint char-error">Maximum {MAX_CHARS.toLocaleString()} characters</span>
-        )}
-        {trimmedLen > 0 && trimmedLen < MIN_CHARS && (
-          <span className="char-hint">Need at least {MIN_CHARS} characters</span>
-        )}
+        <span id="length-guidance" className={`char-hint ${trimmedLen > MAX_CHARS ? 'char-error' : ''}`}>
+          {trimmedLen === 0 ? `At least ${MIN_CHARS} characters required` : trimmedLen < MIN_CHARS ? `Add ${MIN_CHARS - trimmedLen} more characters` : trimmedLen > MAX_CHARS ? 'Text is over the 20,000 character limit' : 'Ready to analyze'}
+        </span>
       </div>
 
       <div className="button-row">
-        <button type="submit" className="btn btn-primary" disabled={!canSubmit} aria-busy={isLoading}>
+        <button type="submit" className="button button-primary" disabled={!canSubmit} aria-busy={isLoading}>
           {isLoading ? 'Analysing…' : 'Analyse'}
         </button>
-        <button type="button" className="btn btn-secondary" onClick={handleClear} disabled={isLoading}>
+        <button type="button" className="button button-outline" onClick={handleClear} disabled={isLoading || !text}>
           Clear
         </button>
       </div>
 
       <div className="samples-row" id="sample-note">
-        <span className="samples-label">Try a sample:</span>
+        <span className="samples-label">Use a sample</span>
         {SAMPLES.map((s) => (
           <button
             key={s.label}
             type="button"
-            className="btn btn-ghost"
+            className="sample-button"
             onClick={() => setText(s.text)}
             disabled={isLoading}
           >

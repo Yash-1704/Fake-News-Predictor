@@ -1,4 +1,5 @@
 const BASE = import.meta.env.VITE_API_URL ?? '/api';
+const ML_BASE = (import.meta.env.VITE_ML_API_URL ?? 'http://localhost:8000').replace(/\/$/, '');
 
 async function request(path, options = {}, { allowFailure = false } = {}) {
   const response = await fetch(`${BASE}${path}`, {
@@ -36,6 +37,13 @@ export async function factCheck(text) {
     method: 'POST',
     body: JSON.stringify({ text }),
   });
+}
+
+export function getNews(topic = '', options = {}) {
+  const query = new URLSearchParams();
+  if (topic.trim()) query.set('topic', topic.trim());
+  const suffix = query.size ? `?${query.toString()}` : '';
+  return request(`/news${suffix}`, { method: 'GET', signal: options.signal });
 }
 
 export async function getCurrentUser() {
@@ -76,8 +84,14 @@ export async function logoutUser() {
   });
 }
 
-export async function fetchModelInfo() {
-  const data = await request('/model-info', { method: 'GET' }, { allowFailure: true });
-  if (!data) throw new Error('Could not fetch model info');
+export async function fetchModelInfo({ signal } = {}) {
+  // Express has no model-info proxy route; this metadata endpoint belongs to FastAPI.
+  const response = await fetch(`${ML_BASE}/model-info`, { signal });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.detail || `Could not fetch model info (${response.status})`);
+  }
+
   return data;
 }
