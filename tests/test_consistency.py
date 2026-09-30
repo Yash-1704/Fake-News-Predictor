@@ -2,7 +2,7 @@
 
 import pytest
 from fastapi.testclient import TestClient
-from backend.main import app
+from backend.python.main import app
 from ml.src.predict import Predictor
 
 SAMPLE_TEXTS = [
@@ -22,13 +22,13 @@ def client():
 
 def test_predictor_vs_api_consistency(client):
     predictor = Predictor.load()
-    
+
     for text in SAMPLE_TEXTS:
         direct_res = predictor.predict(text)
-        
+
         response = client.post("/predict", json={"text": text})
         assert response.status_code == 200
         api_res = response.json()
-        
+
         assert api_res["label"] == direct_res["label"]
         assert pytest.approx(api_res["fake_score"], abs=1e-5) == direct_res["fake_score"]

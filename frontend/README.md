@@ -7,12 +7,12 @@ Single-page web application for the Fake News Detector.
 Run from the **project root** first to start the backend:
 
 ```bash
-# Terminal 1 — backend
+# Terminal 1 — all services
 source .venv/bin/activate
-uvicorn backend.main:app --reload --port 8000
+bash scripts/dev.sh
 ```
 
-Then in a second terminal:
+Or run only the frontend separately:
 
 ```bash
 # Terminal 2 — frontend
@@ -21,7 +21,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173` in your browser. The Vite dev proxy forwards all `/api` requests to the backend on port 8000, so no CORS issues occur in development.
+Open `http://localhost:5173` in your browser. Vite forwards `/api` requests to Express on port 4000; Express uses FastAPI on port 8000 for model predictions.
 
 ## Production build
 

@@ -1,6 +1,6 @@
 # Fake News Detection Using NLP
 
-A web app that classifies a pasted news article as **FAKE** or **REAL** using TF-IDF features and a scikit-learn classifier, served through FastAPI and a React UI.
+A web app that classifies pasted news text with a scikit-learn model, with an Express application API for authentication, news, and fact-check features.
 
 > It is a **text classifier**, not a fact-checker. It predicts whether text resembles the fake or real articles in its training data. It does not verify claims.
 
@@ -9,7 +9,7 @@ A web app that classifies a pasted news article as **FAKE** or **REAL** using TF
 | Layer    | Tech                                                                                  |
 | -------- | ------------------------------------------------------------------------------------- |
 | ML / NLP | Python 3.11+, pandas, scikit-learn (`Pipeline`: cleaning, TF-IDF, classifier), joblib |
-| Backend  | FastAPI + Uvicorn                                                                     |
+| Backend  | Node.js + Express, FastAPI + Uvicorn                                                  |
 | Frontend | React + Vite                                                                          |
 | Tooling  | Git, venv, Jupyter, pytest                                                            |
 
@@ -21,34 +21,40 @@ fake-news-detection/
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
+├── .env.example          # safe template; copy to ignored .env for local use
 ├── .github/copilot-instructions.md
-├── Documents/docs/
-│   ├── SRS.md             # what we are building
-│   ├── ARCHITECTURE.md    # how the pieces fit + contracts
-│   ├── ROADMAP.md         # phase overview
-│   ├── PROGRESS.md        # checklist, update after each phase
-│   ├── DECISIONS.md       # decision log
-│   ├── Learning.md        # human study guide: ML/NLP concepts explained (agents need not read)
-│   ├── LEARNING_LOG.md    # your own notes per phase
-│   └── phases/phase-00 ... phase-09
+├── Documents/
+│   ├── ARCHITECTURE.md    # Full application contracts
+│   ├── SRS.md             # Requirements
+│   ├── PHASES.md          # Combined Phase 0–15 overview
+│   ├── PROGRESS.md        # Completion status and history
+│   ├── DECISIONS.md       # Technical decisions
+│   ├── Learning.md        # ML/NLP/backend study guide
+│   ├── LEARNING_LOG.md    # Concepts covered during development
+│   ├── TESTING.md         # Test evidence
+│   ├── REPORT_NOTES.md    # Evidence-backed report material
+│   ├── DEMO_SCRIPT.md     # Short project demo
+│   ├── PPT_OUTLINE.md     # Presentation outline
+│   └── figures/           # Results and UI illustrations
 ├── ml/                    # python package: data, training, prediction
 │   ├── data/raw|processed # gitignored
 │   ├── notebooks/
 │   ├── src/               # config, data, preprocess, train, predict, ...
 │   ├── models/            # pipeline.joblib (gitignored) + model_card.json
 │   └── reports/           # metrics, figures, error analysis (committed)
-├── backend/               # FastAPI app
+├── backend/
+│   ├── node/              # Express API, auth, news, fact-check, digest
+│   └── python/            # FastAPI prediction service
 ├── frontend/              # React app
-└── tests/
+├── scripts/               # Local development helpers
+└── tests/                 # Python API and model tests
 ```
 
 ## How to work on this project (humans and agents)
 
-1. Read `AGENTS.md`, then `Documents/docs/ARCHITECTURE.md`.
-2. Open `Documents/docs/PROGRESS.md` and find the first unfinished phase.
-3. Open that phase file in `Documents/docs/phases/`. Do **only** that phase.
-4. Verify every item under "Definition of Done", then tick it in `Documents/docs/PROGRESS.md`, add notes to `Documents/docs/LEARNING_LOG.md`, and commit.
-5. Start the next phase in a fresh agent session so context stays small.
+1. Read `AGENTS.md`, then `Documents/ARCHITECTURE.md` and `Documents/SRS.md`.
+2. Use `Documents/PHASES.md` for the development sequence and `Documents/PROGRESS.md` for completed work.
+3. Use the architecture, tests, and code as the current source of truth; all planned phases are complete.
 
 ## Quick start
 
@@ -75,16 +81,16 @@ After placing the files, generate the ignored model artifact from the repository
 .venv/bin/python -m ml.src.train
 ```
 
-Then install the frontend dependencies and start both servers:
+Copy `.env.example` to `.env`, fill in required API keys and SMTP credentials, then install the Node and frontend dependencies and start all three services:
 
 ```bash
-cd frontend
-npm install
-cd ..
+cp .env.example .env
+npm --prefix backend/node install
+npm --prefix frontend install
 bash scripts/dev.sh
 ```
 
-Open http://localhost:5173. The dev script starts the API on http://localhost:8000 and the Vite frontend on http://localhost:5173. Run the Python setup and training commands from the repository root.
+Open http://localhost:5173. The script starts the React frontend on port 5173, Express on port 4000, and FastAPI on port 8000. Run Python setup and training commands from the repository root. Express loads its secrets and service settings from the root `.env`; FastAPI does not require those credentials.
 
 > **Security note:** Loading a `joblib` / `pickle` artifact executes pickled Python code. Only load `pipeline.joblib` files generated by your own training runs.
 
@@ -92,35 +98,37 @@ Open http://localhost:5173. The dev script starts the API on http://localhost:80
 
 - Classifies pasted article text as `FAKE` or `REAL` and displays the model score and a disclaimer.
 - Rejects input shorter than 20 characters or longer than 20,000 characters.
-- Provides health and model information endpoints and a FastAPI `/docs` page.
+- Provides registration/login, a cached news feed, protected Groq fact-checking, and an opt-in weekly email digest.
+- Provides prediction, health, and model-information endpoints through the FastAPI service, including its `/docs` page.
 - The model analyzes writing patterns. It does not verify claims, inspect sources, or fact-check an article.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-  UI[React and Vite UI] -->|JSON through /api| API[FastAPI]
-  API --> P[Predictor]
+  UI[React and Vite UI] -->|/api| API[Express API]
+  API -->|/predict| MLAPI[FastAPI prediction service]
+  MLAPI --> P[Predictor]
   P --> PIPE[Saved scikit-learn Pipeline]
   PIPE --> CLEAN[clean_text]
   CLEAN --> TFIDF[TF-IDF unigrams]
   TFIDF --> LR[Logistic Regression]
 ```
 
-Training is offline. The training command loads the prepared datasets, fits the pipeline on the training split, evaluates it, and saves the model artifact and model card. The API loads that saved pipeline at startup.
+Express handles sessions, news, fact-checking, and weekly digests. It proxies prediction requests to FastAPI, which loads the saved model pipeline at startup. Training is offline: it loads prepared datasets, fits on the training split, evaluates, and saves the model artifact and model card.
 
 ## Dataset Summary
 
 Both datasets are manually downloaded; the CSV files are gitignored. Source links, target paths, and license notes are in [Dataset setup](#dataset-setup).
 
-| Dataset | Clean rows | FAKE | REAL | Dropped as duplicates / invalid |
-|---|---:|---:|---:|---:|
-| ISOT | 39,100 | 17,905 (45.79%) | 21,195 (54.21%) | 5,798 |
-| Kaggle Fake or Real News | 6,305 | 3,151 (49.98%) | 3,154 (50.02%) | 30 |
+| Dataset                  | Clean rows |            FAKE |            REAL | Dropped as duplicates / invalid |
+| ------------------------ | ---------: | --------------: | --------------: | ------------------------------: |
+| ISOT                     |     39,100 | 17,905 (45.79%) | 21,195 (54.21%) |                           5,798 |
+| Kaggle Fake or Real News |      6,305 |  3,151 (49.98%) |  3,154 (50.02%) |                              30 |
 
 Counts and class balance are from [`eda_summary.md`](ml/reports/eda_summary.md).
 
-![Class balance after cleaning](Documents/docs/figures/class_balance.png)
+![Class balance after cleaning](Documents/figures/class_balance.png)
 
 ## NLP Pipeline
 
@@ -130,49 +138,49 @@ The final pipeline applies `clean_text`, unigram TF-IDF with at most 50,000 feat
 
 The table reports every tested preprocessing/classifier combination. CV F1 is the five-fold stratified mean and standard deviation; the held-out test and cross-dataset metrics and fit times come from [`experiments.csv`](ml/reports/experiments.csv).
 
-| Combination | CV F1 mean ± SD | ISOT test F1 | Second-dataset F1 | Fit time (s) |
-|---|---:|---:|---:|---:|
-| P1_LR | 98.31% ± 0.20% | 98.07% | 69.63% | 16.43 |
-| P4_LR | 97.45% ± 0.23% | 97.60% | 69.35% | 37.58 |
-| **P2_LR (selected)** | **97.70% ± 0.29%** | **97.62%** | **69.13%** | **39.00** |
-| P3_LR | 98.04% ± 0.26% | 98.20% | 68.94% | 80.46 |
-| P4_SVM | 98.41% ± 0.16% | 98.37% | 68.67% | 36.14 |
-| P1_SVM | 99.24% ± 0.06% | 99.16% | 68.65% | 16.16 |
-| P2_SVM | 98.62% ± 0.14% | 98.64% | 68.50% | 37.77 |
-| P3_SVM | 98.97% ± 0.15% | 99.09% | 68.39% | 81.71 |
-| P3_NB | 94.49% ± 0.36% | 94.38% | 64.42% | 74.31 |
-| P1_NB | 93.56% ± 0.43% | 93.56% | 63.68% | 15.34 |
-| P2_NB | 93.01% ± 0.43% | 92.90% | 63.45% | 34.45 |
-| P4_NB | 92.70% ± 0.36% | 92.59% | 63.27% | 35.49 |
+| Combination          |    CV F1 mean ± SD | ISOT test F1 | Second-dataset F1 | Fit time (s) |
+| -------------------- | -----------------: | -----------: | ----------------: | -----------: |
+| P1_LR                |     98.31% ± 0.20% |       98.07% |            69.63% |        16.43 |
+| P4_LR                |     97.45% ± 0.23% |       97.60% |            69.35% |        37.58 |
+| **P2_LR (selected)** | **97.70% ± 0.29%** |   **97.62%** |        **69.13%** |    **39.00** |
+| P3_LR                |     98.04% ± 0.26% |       98.20% |            68.94% |        80.46 |
+| P4_SVM               |     98.41% ± 0.16% |       98.37% |            68.67% |        36.14 |
+| P1_SVM               |     99.24% ± 0.06% |       99.16% |            68.65% |        16.16 |
+| P2_SVM               |     98.62% ± 0.14% |       98.64% |            68.50% |        37.77 |
+| P3_SVM               |     98.97% ± 0.15% |       99.09% |            68.39% |        81.71 |
+| P3_NB                |     94.49% ± 0.36% |       94.38% |            64.42% |        74.31 |
+| P1_NB                |     93.56% ± 0.43% |       93.56% |            63.68% |        15.34 |
+| P2_NB                |     93.01% ± 0.43% |       92.90% |            63.45% |        34.45 |
+| P4_NB                |     92.70% ± 0.36% |       92.59% |            63.27% |        35.49 |
 
 P1_LR has a slightly higher cross-dataset F1, but it uses raw text and retains publisher artifacts. P2_LR was selected for its explicit artifact cleaning, native `predict_proba`, and competitive performance. The comparison and rationale are recorded in [`model_selection.md`](ml/reports/model_selection.md) and [`leakage_report.md`](ml/reports/leakage_report.md).
 
-![Model comparison across tested combinations](Documents/docs/figures/model_comparison.png)
+![Model comparison across tested combinations](Documents/figures/model_comparison.png)
 
 ## Results
 
 The final artifact is P2_LR, model version `2026-09-28-lr-v1`. Its in-domain and cross-dataset results are shown side by side; the second dataset is an unseen evaluation set, not training data.
 
-| Evaluation | Accuracy | Precision (FAKE) | Recall (FAKE) | F1 (FAKE) |
-|---|---:|---:|---:|---:|
-| ISOT held-out test | 97.84% | 98.44% | 96.82% | 97.62% |
-| Kaggle Fake or Real News | not reported | not reported | not reported | 69.13% |
+| Evaluation               |     Accuracy | Precision (FAKE) | Recall (FAKE) | F1 (FAKE) |
+| ------------------------ | -----------: | ---------------: | ------------: | --------: |
+| ISOT held-out test       |       97.84% |           98.44% |        96.82% |    97.62% |
+| Kaggle Fake or Real News | not reported |     not reported |  not reported |    69.13% |
 
 The ISOT metrics and cross-dataset F1 are from [`experiments.csv`](ml/reports/experiments.csv), corroborated by [`model_selection.md`](ml/reports/model_selection.md) and [`leakage_report.md`](ml/reports/leakage_report.md). Other cross-dataset metrics are not reported in `ml/reports/`. The cross-dataset results document a substantial domain shift; they should not be presented as real-world fact-checking performance.
 
-![Baseline Logistic Regression confusion matrix](Documents/docs/figures/baseline_confusion_matrix.png)
+![Baseline Logistic Regression confusion matrix](Documents/figures/baseline_confusion_matrix.png)
 
-![Top baseline Logistic Regression features](Documents/docs/figures/top_features_baseline.png)
+![Top baseline Logistic Regression features](Documents/figures/top_features_baseline.png)
 
-![Top features after cleaning](Documents/docs/figures/top_features_cleaned.png)
+![Top features after cleaning](Documents/figures/top_features_cleaned.png)
 
 The baseline's strongest weights include publisher markers such as `reuters`, `via`, and `featured`; the cleaned model removes these specific artifacts. See [`leakage_report.md`](ml/reports/leakage_report.md) for the analysis and examples.
 
 ## UI Screenshots
 
-![Article input screen](Documents/docs/figures/ui-home.png)
+![Article input screen](Documents/figures/ui-home.png)
 
-![Example prediction result](Documents/docs/figures/ui-result.png)
+![Example prediction result](Documents/figures/ui-result.png)
 
 ## Limitations
 
@@ -188,4 +196,4 @@ Possible next experiments include broader and more recent datasets, temporal and
 
 ## Reports and Reproducibility
 
-Detailed metrics, cleaning analysis, errors, and selection rationale are in [`ml/reports/`](ml/reports/). The API contract and system boundaries are described in [`Documents/docs/ARCHITECTURE.md`](Documents/docs/ARCHITECTURE.md). Use the commands above to install dependencies, add the datasets, train the ignored model artifact, and start the app.
+Detailed metrics, cleaning analysis, errors, and selection rationale are in [`ml/reports/`](ml/reports/). The API contract and system boundaries are described in [`Documents/ARCHITECTURE.md`](Documents/ARCHITECTURE.md). Use the commands above to install dependencies, add the datasets, train the ignored model artifact, and start the app.

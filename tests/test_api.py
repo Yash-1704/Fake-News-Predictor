@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from backend.main import app
+from backend.python.main import app
 from ml.src import config
 
 
