@@ -12,7 +12,13 @@ Update after each phase. An agent must find the first unchecked phase here.
 
 - [x] Phase 7: Frontend
 - [x] Phase 8: Integration and hardening
-- [ ] Phase 9: Docs, results, viva
+- [x] Phase 9: Docs, results, viva
+- [x] Phase 10: Node/Express + MongoDB setup
+- [x] Phase 11: Auth
+- [x] Phase 12: News feed
+- [x] Phase 13: Fact-check (Groq)
+- [x] Phase 14: Frontend integration
+- [x] Phase 15: Weekly email (optional, cut first if short on time)
 
 ## Key numbers (fill from real runs)
 
@@ -59,4 +65,49 @@ Update after each phase. An agent must find the first unchecked phase here.
 - The temporary clean-room folder and its generated artifacts were removed; next phase is Phase 9.
 - Human: add your own Phase 8 entry to `Documents/docs/LEARNING_LOG.md`.
 
-- Phase 9 drafting checkpoint: README, report notes, blank viva prompts, demo script, 12-slide outline, and figure assets are prepared; links, report metrics, Python tests, and frontend build verified. Phase 9 remains open for the human's viva answers and two independent demo runs.
+- Phase 9 completion confirmed by the human: viva answers and two independent demo runs are complete.
+
+### Phase 10 handoff
+
+- Phase 10 complete: added the Express server, FastAPI prediction proxy, MongoDB Check upsert, and server environment configuration.
+- `npm run dev` connected to MongoDB; the prediction route returned the FastAPI response with HTTP 200 and persisted a Check document.
+- Repeating the same article incremented `checkCount` from 1 to 2; with FastAPI stopped, the route returned a JSON error with HTTP 502.
+- Next: Phase 11 (auth).
+- Human: add your own Phase 10 entry to `Documents/docs/LEARNING_LOG.md`.
+
+### Phase 11 handoff
+
+- Phase 11 complete: implemented JWT cookie auth with `register`, `login`, `logout`, and `/me` routes plus global `attachUserIfPresent` middleware.
+- Verified via curl: registration returned 201, duplicate registration returned 409, wrong password returned 401 with the same message as a bad login, `/me` returned the user with a valid cookie and `{user:null}` without one, and guest `/api/predict` still returned HTTP 200.
+- Passwords are stored as bcrypt hashes and the cookie is cleared by logout; no plaintext credentials were logged.
+- Next: Phase 12 (news feed).
+
+### Phase 12 handoff
+
+- Phase 12 complete: added a cached news feed backed by MongoDB, a GNews refresh job, and a React page that renders live headlines.
+- Verified with curl: `/api/news` returned a real JSON list with `items`, and `/api/news?topic=elections` returned topic-specific cached results with HTTP 200.
+- The server refresh job runs on startup and every 2 hours, and the route caches topic misses instead of calling GNews on every request.
+- Next: Phase 13 (fact-check).
+
+### Phase 13 handoff
+
+- Phase 13 complete: added a cached, protected fact-check route backed by Groq and MongoDB, with a stable SHA-256 dedupe key and graceful unavailable fallback.
+- Verified with live API checks: unauthenticated POST returned HTTP 401, a valid cookie returned a verdict/explanation, and a second identical submission returned `cached: true` without rerunning Groq.
+- The parser tolerates malformed model output and falls back to an `unverifiable` verdict instead of crashing, and the forced-error path returned the required `{verdict:"unavailable", ...}` payload.
+- Real Groq output was confirmed with a working model (`qwen/qwen3.8-27b`); the previous default model name was invalid for this account.
+- Next: Phase 14 (frontend integration).
+
+### Phase 14 handoff
+
+- Phase 14 complete: the React app now talks to Express instead of FastAPI, keeps the user session via cookie-backed auth state, and gates fact-checking behind login while keeping guest NLP predictions available.
+- Verified by build: `npm run build` in `frontend/` succeeded; the new login/register views and fact-check panel compiled without JSX or import errors.
+- Logged-out users now see the fact-check action disabled with a prompt to log in, and logged-in users get a verdict panel with explanation and source list plus the required disclaimer.
+- Next: Phase 15 (optional weekly email).
+
+### Phase 15 handoff
+
+- Phase 15 complete: added the weekly digest job, SMTP mailer, admin trigger route, and a cookie-backed email opt-in toggle in the user nav.
+- Verified with live backend checks: a registered user could hit `/api/admin/run-digest` successfully and the server returned `{"sent":0,"skipped":0,"reason":"SMTP credentials missing"}` instead of crashing when Gmail credentials were absent.
+- The digest flow is implemented and safe to enable; once `SMTP_USER` and `SMTP_APP_PASSWORD` are set in `server/.env`, it will send the HTML digest to opted-in users and skip opt-outs.
+- Next: add the real Gmail app password to the environment and trigger a live send to a valid recipient address.
+- Human: add your own Phase 15 entry to `Documents/docs/LEARNING_LOG.md`.

@@ -6,12 +6,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // Forward /api to FastAPI backend, stripping the /api prefix
-      // This avoids CORS issues during development
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:4000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

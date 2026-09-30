@@ -55,4 +55,9 @@ Rules:
 - When an ML concept first appears in code, explain it in 2 to 3 plain sentences and name the Learning.md section (e.g. "Learning.md 4.3") instead of pasting documentation.
 - Ask a question only when you are blocked.
 - At the end of each phase: tick docs/PROGRESS.md, add a 3 to 5 line handoff note under "Notes / blockers" (what's done, what's next, anything odd), and prompt me to write my own entry in docs/LEARNING_LOG.md (don't write it for me).
+## Extension phases (10–15)
+See docs/TWO_DAY_PLAN.md and docs/ARCHITECTURE_EXT.md. Read order for these
+phases: TWO_DAY_PLAN.md → ARCHITECTURE_EXT.md → the current phase file.
+Do not read the Phase 0–9 ML phase files unless a task touches ml/ or backend/.
+
 
