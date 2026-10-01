@@ -19,7 +19,10 @@ async function request(path, options = {}, { allowFailure = false } = {}) {
       typeof data === 'string'
         ? data
         : data?.detail || data?.error || `Request failed (${response.status})`;
-    throw new Error(message);
+    const error = new Error(message);
+    error.status = response.status;
+    error.data = data;
+    throw error;
   }
 
   return data;
@@ -34,6 +37,13 @@ export async function predict(text) {
 
 export async function factCheck(text) {
   return request('/factcheck', {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  });
+}
+
+export async function webSearchFactCheck(text) {
+  return request('/factcheck/websearch', {
     method: 'POST',
     body: JSON.stringify({ text }),
   });
@@ -54,6 +64,9 @@ export async function getCurrentUser() {
     displayName: data.displayName || '',
     profileImageUrl: data.profileImageUrl || '',
     emailOptIn: data.emailOptIn ?? true,
+    isPremiumMember: data.isPremiumMember ?? false,
+    webSearchUsageCount: data.webSearchUsageCount ?? 0,
+    webSearchFreeLimit: data.webSearchFreeLimit ?? 5,
   } : null;
 }
 

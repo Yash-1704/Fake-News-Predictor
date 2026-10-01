@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { CircleCheck } from 'lucide-react';
+import { ArrowRight, CircleCheck, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { ProfileAvatar } from '../components/ProfileAvatar';
 
@@ -75,6 +76,16 @@ export function SettingsPage() {
           {profileSaved && <p className="settings-feedback success" role="status"><CircleCheck size={15} /> Profile saved.</p>}
           <button className="button button-outline profile-save" type="submit" disabled={profileSaving || !displayName.trim()}>{profileSaving ? 'Saving…' : 'Save profile'}</button>
         </form>
+        </div>
+      </section>
+
+      <section className="settings-section">
+        <div className="settings-section-heading"><h2>Premium</h2><p>More room for live web research.</p></div>
+        <div className="settings-body premium-settings">
+          <p>{user?.isPremiumMember ? 'Premium membership is active with unlimited web-search fact-checks.' : 'Free accounts include five lifetime web-search fact-checks.'}</p>
+          <Link className="button button-outline" to="/premium">
+            <Sparkles size={16} /> {user?.isPremiumMember ? 'View membership' : 'Explore Premium'} <ArrowRight size={15} />
+          </Link>
         </div>
       </section>
 

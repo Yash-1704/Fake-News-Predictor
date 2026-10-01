@@ -9,6 +9,7 @@ import { RequireAuth } from './components/RequireAuth';
 import { AboutPage } from './pages/AboutPage';
 import { HomePage } from './pages/HomePage';
 import NewsFeed from './pages/NewsFeed';
+import { PremiumPage } from './pages/Premium';
 import { SettingsPage } from './pages/SettingsPage';
 import './styles.css';
 
@@ -59,6 +60,7 @@ function AppShell() {
       <Routes>
         <Route path="/" element={<HomePage onOpenAuth={openAuth} />} />
         <Route path="/news" element={<NewsFeed onOpenAuth={openAuth} />} />
+        <Route path="/premium" element={<PremiumPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/settings" element={<RequireAuth onRequestLogin={openAuth}><SettingsPage /></RequireAuth>} />
         <Route path="*" element={<NotFoundPage />} />

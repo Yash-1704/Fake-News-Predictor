@@ -11,6 +11,8 @@ module.exports = {
   gnewsApiKey: process.env.GNEWS_API_KEY,
   groqApiKey: process.env.GROQ_API_KEY,
   groqModel: process.env.GROQ_MODEL || "qwen/qwen3.8-27b",
+  groqWebsearchModel: process.env.GROQ_WEBSEARCH_MODEL || "openai/gpt-oss-20b",
+  freeWebSearchLimit: Number.parseInt(process.env.WEB_SEARCH_FREE_LIMIT || "5", 10),
   smtpUser: process.env.SMTP_USER,
   smtpAppPassword: process.env.SMTP_APP_PASSWORD,
 };

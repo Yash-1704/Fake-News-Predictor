@@ -114,6 +114,9 @@ router.get("/me", async (req, res) => {
     displayName: user?.displayName || "",
     profileImageUrl: user?.profileImageUrl || "",
     emailOptIn: user?.emailOptIn ?? true,
+    isPremiumMember: user?.isPremiumMember ?? false,
+    webSearchUsageCount: user?.webSearchUsageCount ?? 0,
+    webSearchFreeLimit: config.freeWebSearchLimit,
   });
 });
 

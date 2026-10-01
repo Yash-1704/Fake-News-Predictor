@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   displayName: { type: String, trim: true, maxlength: 60, default: "" },
   profileImageUrl: { type: String, trim: true, maxlength: 500, default: "" },
   emailOptIn: { type: Boolean, default: true },
+  isPremiumMember: { type: Boolean, default: false },
+  webSearchUsageCount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
 });
 

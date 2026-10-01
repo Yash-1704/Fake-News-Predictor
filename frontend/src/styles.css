@@ -284,6 +284,19 @@ a { color: inherit; }
 .source-block a { display: inline-flex; align-items: center; gap: 3px; margin-left: auto; font-weight: 600; text-decoration: none; background: linear-gradient(var(--mark), var(--mark)) no-repeat 0 92% / 0 36%; transition: background-size 180ms ease; }
 .source-block a:hover { background-size: 100% 36%; }
 .fact-check-empty { color: var(--ink-muted); font-size: 0.875rem; }
+.web-search-trigger { margin-top: 16px; }
+.web-search-result { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--line-strong); animation: fade-in 220ms ease both; }
+.web-search-result .fact-check-title-wrap { margin-bottom: 12px; }
+.web-search-result .fact-check-title-wrap h3 { font-size: 1.125rem; font-weight: 700; }
+.web-search-source-block h4 { margin-bottom: 4px; color: var(--ink-muted); font-size: 0.8125rem; font-weight: 600; }
+.web-search-source-block li { padding-block: 8px; border-top: 1px solid var(--line); font-size: 0.875rem; }
+.web-search-source-block a { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; overflow-wrap: anywhere; text-decoration: none; }
+.web-search-source-block a:hover { text-decoration: underline; }
+.web-search-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 16px; }
+.web-search-actions .web-search-trigger { margin-top: 0; }
+.web-search-usage { color: var(--ink-muted); font-size: 0.875rem; }
+.web-search-limit-message { margin-top: 10px; color: var(--fake); font-size: 0.9rem; }
+.web-search-limit-message a { color: inherit; font-weight: 700; }
 .fact-check-disclaimer { margin-top: 16px; color: var(--ink-muted); font-size: 0.8125rem; line-height: 1.55; }
 
 .inline-error, .error-banner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1px solid color-mix(in srgb, var(--fake) 32%, var(--line)); border-radius: var(--r-m); color: var(--fake); background: var(--fake-soft); }
@@ -337,6 +350,21 @@ a { color: inherit; }
 .feed-gate h2 { font-size: 1.25rem; font-weight: 700; }
 .feed-gate p { margin-top: 4px; color: var(--ink-soft); font-size: 0.9375rem; }
 
+/* ---------- Premium ---------- */
+
+.premium-page .page-heading { margin-bottom: 32px; }
+.premium-plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; max-width: 860px; }
+.premium-plan { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: 24px; border: 1px solid var(--line-strong); border-radius: var(--r-m); background: var(--surface); }
+.premium-plan-featured { border-color: var(--ink); box-shadow: inset 0 3px 0 var(--mark); }
+.premium-plan h2 { margin-top: 8px; font-size: 1.5rem; font-weight: 750; }
+.plan-price { margin-top: 16px; font-size: 1.75rem; font-weight: 750; }
+.plan-price span { color: var(--ink-muted); font-size: 0.9rem; font-weight: 500; }
+.plan-features { display: grid; gap: 12px; width: 100%; margin-block: 20px 24px; }
+.plan-features li { display: flex; align-items: flex-start; gap: 9px; color: var(--ink-soft); font-size: 0.9375rem; }
+.plan-features svg { flex: 0 0 auto; margin-top: 2px; color: var(--real); }
+.premium-demo-button { width: 100%; margin-top: auto; }
+.premium-note { max-width: 860px; margin-top: 20px; color: var(--ink-muted); font-size: 0.875rem; line-height: 1.6; }
+
 /* ---------- About ---------- */
 
 .about-method { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; gap: 64px; padding-bottom: 56px; }
@@ -374,6 +402,9 @@ a { color: inherit; }
 .settings-section-heading h2 { font-size: 1.125rem; font-weight: 700; }
 .settings-section-heading p { margin-top: 4px; color: var(--ink-soft); font-size: 0.9rem; }
 .settings-body { max-width: 480px; }
+.premium-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; }
+.premium-settings > p { flex: 1 1 240px; color: var(--ink-soft); font-size: 0.9375rem; line-height: 1.5; }
+.premium-settings .button { flex: 0 0 auto; }
 .account-row { display: flex; flex-direction: column; gap: 2px; padding-bottom: 24px; }
 .account-row > span { color: var(--ink-muted); font-size: 0.8125rem; font-weight: 600; }
 .account-row > strong { overflow-wrap: anywhere; font-size: 1.0625rem; font-weight: 600; }

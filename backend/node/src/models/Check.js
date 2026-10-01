@@ -6,6 +6,7 @@ const checkSchema = new mongoose.Schema({
   nlpLabel: { type: String, enum: ["FAKE", "REAL"], required: true },
   nlpScore: { type: Number, required: true },
   factCheck: { type: mongoose.Schema.Types.Mixed, default: null },
+  webSearchResult: { type: mongoose.Schema.Types.Mixed, default: null },
   checkCount: { type: Number, default: 1 },
   lastCheckedAt: { type: Date, default: Date.now },
 });

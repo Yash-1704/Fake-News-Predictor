@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { ChevronDown, LogOut, Menu, Moon, Settings, Sun, X } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
@@ -7,6 +7,22 @@ import { ProfileAvatar } from './ProfileAvatar';
 export function Navbar({ theme, onToggleTheme, onOpenAuth, onLogout }) {
   const { user, loading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const profileMenuRef = useRef(null);
+
+  useEffect(() => {
+    function closeProfileMenu(event) {
+      if (event.type === 'keydown' && event.key !== 'Escape') return;
+      if (event.type === 'pointerdown' && profileMenuRef.current?.contains(event.target)) return;
+      profileMenuRef.current?.removeAttribute('open');
+    }
+
+    document.addEventListener('pointerdown', closeProfileMenu);
+    document.addEventListener('keydown', closeProfileMenu);
+    return () => {
+      document.removeEventListener('pointerdown', closeProfileMenu);
+      document.removeEventListener('keydown', closeProfileMenu);
+    };
+  }, []);
 
   function closeMobile() {
     setMobileOpen(false);
@@ -33,6 +49,7 @@ export function Navbar({ theme, onToggleTheme, onOpenAuth, onLogout }) {
           <nav className="primary-nav" aria-label="Main navigation">
             <NavLink to="/" end onClick={closeMobile} className={({ isActive }) => `nav-link ${isActive ? 'nav-link-active' : ''}`}>Analyze</NavLink>
             <NavLink to="/news" onClick={closeMobile} className={({ isActive }) => `nav-link ${isActive ? 'nav-link-active' : ''}`}>News feed</NavLink>
+            <NavLink to="/premium" onClick={closeMobile} className={({ isActive }) => `nav-link ${isActive ? 'nav-link-active' : ''}`}>Premium</NavLink>
             <NavLink to="/about" onClick={closeMobile} className={({ isActive }) => `nav-link ${isActive ? 'nav-link-active' : ''}`}>About</NavLink>
           </nav>
 
@@ -49,7 +66,7 @@ export function Navbar({ theme, onToggleTheme, onOpenAuth, onLogout }) {
             {loading ? (
               <span className="nav-loading" role="status">Checking session…</span>
             ) : user ? (
-              <details className="profile-menu">
+              <details className="profile-menu" ref={profileMenuRef}>
                 <summary className="profile-trigger">
                   <ProfileAvatar displayName={user.displayName} email={user.email} imageUrl={user.profileImageUrl} size="small" />
                   <span className="profile-email">{user.displayName || user.email?.split('@')[0] || user.email}</span>

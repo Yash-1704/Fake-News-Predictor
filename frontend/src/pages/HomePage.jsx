@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { CircleHelp, LockKeyhole } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { factCheck, predict } from '../api';
+import { factCheck, predict, webSearchFactCheck } from '../api';
 import { useAuth } from '../context/useAuth';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { FactCheckPanel } from '../components/FactCheckPanel';
@@ -9,13 +9,16 @@ import { NewsForm } from '../components/NewsForm';
 import { ResultCard } from '../components/ResultCard';
 
 export function HomePage({ onOpenAuth }) {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [analysisStatus, setAnalysisStatus] = useState('idle');
   const [analysisError, setAnalysisError] = useState('');
   const [result, setResult] = useState(null);
   const [submittedText, setSubmittedText] = useState('');
   const [factCheckStatus, setFactCheckStatus] = useState('idle');
   const [factCheckResult, setFactCheckResult] = useState(null);
+  const [webSearchStatus, setWebSearchStatus] = useState('idle');
+  const [webSearchResult, setWebSearchResult] = useState(null);
+  const [webSearchLimitError, setWebSearchLimitError] = useState(null);
   const requestId = useRef(0);
 
   async function handleAnalyze(text) {
@@ -27,6 +30,9 @@ export function HomePage({ onOpenAuth }) {
     setResult(null);
     setFactCheckResult(null);
     setFactCheckStatus('idle');
+    setWebSearchResult(null);
+    setWebSearchStatus('idle');
+    setWebSearchLimitError(null);
 
     try {
       const prediction = await predict(text);
@@ -48,6 +54,9 @@ export function HomePage({ onOpenAuth }) {
     setSubmittedText('');
     setFactCheckStatus('idle');
     setFactCheckResult(null);
+    setWebSearchStatus('idle');
+    setWebSearchResult(null);
+    setWebSearchLimitError(null);
   }
 
   async function performFactCheck(text) {
@@ -80,6 +89,49 @@ export function HomePage({ onOpenAuth }) {
       return;
     }
     void performFactCheck(submittedText);
+  }
+
+  async function performWebSearch(text) {
+    setWebSearchStatus('loading');
+    setWebSearchResult(null);
+    setWebSearchLimitError(null);
+    try {
+      const response = await webSearchFactCheck(text);
+      setWebSearchResult(response);
+      setWebSearchStatus('success');
+      if (!response.cached && response.verdict !== 'unavailable') await refreshUser();
+    } catch (error) {
+      if (error.message.includes('Login required')) {
+        setWebSearchStatus('idle');
+        onOpenAuth('login', () => { void performWebSearch(text); });
+        return;
+      }
+      if (error.status === 403 && error.data?.limitReached) {
+        setWebSearchLimitError({
+          used: error.data.used,
+          limit: error.data.limit,
+          upgradeUrl: error.data.upgradeUrl || '/premium',
+        });
+        setWebSearchStatus('limit');
+        return;
+      }
+      setWebSearchResult({
+        verdict: 'unavailable',
+        explanation: error.message || 'Web search is temporarily unavailable. Please try again later.',
+        sources: [],
+        cached: false,
+      });
+      setWebSearchStatus('error');
+    }
+  }
+
+  function handleWebSearch() {
+    if (!submittedText || factCheckResult?.verdict !== 'unverifiable') return;
+    if (!user) {
+      onOpenAuth('login', () => { void performWebSearch(submittedText); });
+      return;
+    }
+    void performWebSearch(submittedText);
   }
 
   function scrollToAnalyzer() {
@@ -124,8 +176,12 @@ export function HomePage({ onOpenAuth }) {
                 <FactCheckPanel
                   articleText={submittedText}
                   result={factCheckResult}
+                  webSearchResult={webSearchResult}
+                  webSearchLimitError={webSearchLimitError}
                   loading={factCheckStatus === 'loading'}
+                  webSearchLoading={webSearchStatus === 'loading'}
                   onFactCheck={handleFactCheck}
+                  onWebSearch={handleWebSearch}
                   onRequestLogin={() => onOpenAuth('login', () => { void performFactCheck(submittedText); })}
                   user={user}
                 />
