@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, LoaderCircle, Newspaper, RefreshCw, Search } from 'lucide-react';
+import { Newspaper, RefreshCw, Search } from 'lucide-react';
 import { getNews } from '../api';
 import { useAuth } from '../context/useAuth';
 import { NewsArticleCard } from '../components/NewsArticleCard';
@@ -36,7 +36,6 @@ export default function NewsFeed({ onOpenAuth }) {
   return (
     <main className="page-shell content-page news-page">
       <header className="page-heading news-heading">
-        <span className="section-kicker">THE READING LIST <span>02</span></span>
         <h1>Headlines, with context.</h1>
         <p>Stories from the existing news cache. Read the source before drawing conclusions.</p>
       </header>
@@ -50,11 +49,16 @@ export default function NewsFeed({ onOpenAuth }) {
       </form>
 
       <div className="feed-heading-row">
-        <div><span className="section-kicker">{appliedTopic ? 'TOPIC RESULTS' : 'LATEST STORIES'}</span><h2>{appliedTopic || 'Recent headlines'}</h2></div>
+        <div>{appliedTopic && <p className="feed-context">Results for</p>}<h2 className={appliedTopic ? 'feed-topic' : undefined}>{appliedTopic || 'Recent headlines'}</h2></div>
         {status === 'success' && <span className="feed-count">{items.length} {items.length === 1 ? 'story' : 'stories'}</span>}
       </div>
 
-      {status === 'loading' && <div className="loading-line" role="status"><LoaderCircle size={17} className="spin-icon" /> Loading headlines…</div>}
+      {status === 'loading' && (
+        <>
+          <div className="loading-line" role="status"><span className="loading-pulse" /> Loading headlines…</div>
+          <div className="news-skeleton" aria-hidden="true"><span /><span /><span /></div>
+        </>
+      )}
       {status === 'error' && <div className="inline-error" role="alert"><Newspaper size={18} /><div><strong>Headlines couldn't load.</strong><p>{error}</p><button className="text-button" type="button" onClick={() => setRefreshKey((value) => value + 1)}><RefreshCw size={14} /> Try again</button></div></div>}
       {status === 'success' && items.length === 0 && <div className="empty-state"><Newspaper size={22} /><h3>No headlines found</h3><p>Try a different topic.</p></div>}
       {status === 'success' && items.length > 0 && (
@@ -63,8 +67,8 @@ export default function NewsFeed({ onOpenAuth }) {
 
       {!user && status === 'success' && (
         <aside className="feed-gate">
-          <div><span className="section-kicker">READER PREVIEW</span><h2>Keep exploring the full feed.</h2><p>Sign in to view up to twenty cached headlines at a time.</p></div>
-          <button className="button button-primary" type="button" onClick={() => onOpenAuth('login')}>Sign in <ArrowRight size={16} /></button>
+          <div><h2>Keep exploring the full feed.</h2><p>Sign in to view up to twenty cached headlines at a time.</p></div>
+          <button className="button button-primary" type="button" onClick={() => onOpenAuth('login')}>Sign in</button>
         </aside>
       )}
     </main>

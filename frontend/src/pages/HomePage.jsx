@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { ArrowDown, ArrowRight, Check, CircleHelp, LockKeyhole, Sparkles } from 'lucide-react';
+import { CircleHelp, LockKeyhole } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { factCheck, predict } from '../api';
 import { useAuth } from '../context/useAuth';
@@ -90,31 +90,27 @@ export function HomePage({ onOpenAuth }) {
     <main>
       <section className="home-hero page-shell">
         <div className="hero-copy">
-          <p className="eyebrow"><span className="eyebrow-dot" /> TEXT PATTERNS, NOT TRUTH CLAIMS</p>
-          <h1>Read the story.<br /><em>Question the signal.</em></h1>
+          <h1>Read the story.<br />Question the signal.</h1>
           <p className="hero-description">See how an article's writing compares with patterns in the training data. A model label is a prompt to think, not proof.</p>
           <div className="hero-actions">
-            <button className="button button-primary" type="button" onClick={scrollToAnalyzer}>Analyze an article <ArrowDown size={16} /></button>
-            <Link className="button button-outline" to="/news">Explore the news <ArrowRight size={16} /></Link>
+            <button className="button button-primary" type="button" onClick={scrollToAnalyzer}>Analyze an article</button>
+            <Link className="button button-outline" to="/news">Explore the news</Link>
           </div>
           <div className="hero-disclaimer"><CircleHelp size={15} /><span>Does not verify claims, sources, or authors.</span></div>
         </div>
         <div className="hero-note" aria-label="How analysis works">
-          <span className="note-index">01 / THE METHOD</span>
-          <div className="signal-rule"><i /><i /><i /><i /><i /><i /><i /><i /><i /></div>
-          <p>Language patterns<br />are not evidence.</p>
-          <span className="note-caption">TF-IDF + LOGISTIC REGRESSION</span>
+          <p><span className="marked">Language patterns<br />are not evidence.</span></p>
+          <span className="note-caption">TF-IDF + Logistic Regression</span>
         </div>
       </section>
 
       <section id="article-analyzer" className="analyzer-section page-shell" aria-labelledby="analyzer-title">
         <div className="section-intro">
           <div>
-            <span className="section-kicker">YOUR WORKSPACE <span>01</span></span>
             <h2 id="analyzer-title">Analyze an article</h2>
             <p>Paste text or choose a sample. Keep the full article for more context.</p>
           </div>
-          <span className="length-rule">20–20,000 CHARACTERS</span>
+          <span className="length-rule">20 to 20,000 characters</span>
         </div>
 
         <div className="analyzer-grid">
@@ -138,20 +134,20 @@ export function HomePage({ onOpenAuth }) {
           </div>
 
           <aside className="analysis-aside">
-            <span className="aside-kicker"><Check size={15} /> HOW TO READ THIS</span>
+            <h2 className="aside-title">How to read this</h2>
             <ol className="reading-steps">
               <li><span>1</span><div><strong>Pattern label</strong><p>FAKE or REAL reflects the dataset label the text resembles.</p></div></li>
               <li><span>2</span><div><strong>Model score</strong><p>An uncalibrated score for the FAKE class, not confidence or truth probability.</p></div></li>
               <li><span>3</span><div><strong>Optional fact-check</strong><p>Sign in to compare against limited related news context.</p></div></li>
             </ol>
-            <div className="aside-lock"><LockKeyhole size={15} /><span>AI fact-checking requires an account.</span><Sparkles size={15} className="aside-spark" /></div>
+            <div className="aside-lock"><LockKeyhole size={15} /><span>AI fact-checking requires an account.</span></div>
           </aside>
         </div>
       </section>
 
       <section className="closing-note page-shell">
         <p>Good reading starts with curiosity.</p>
-        <Link to="/about">Learn how this model works <ArrowRight size={15} /></Link>
+        <Link to="/about">Learn how this model works</Link>
       </section>
     </main>
   );

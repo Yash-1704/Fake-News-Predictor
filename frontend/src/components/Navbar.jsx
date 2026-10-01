@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { ChevronDown, FileText, LogOut, Menu, Moon, Settings, Sun, X } from 'lucide-react';
+import { ChevronDown, LogOut, Menu, Moon, Settings, Sun, X } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 import { ProfileAvatar } from './ProfileAvatar';
 
@@ -16,8 +16,7 @@ export function Navbar({ theme, onToggleTheme, onOpenAuth, onLogout }) {
     <header className="site-header">
       <div className="nav-shell">
         <Link className="brand" to="/" onClick={closeMobile} aria-label="News Pattern Analyzer home">
-          <span className="brand-mark"><FileText size={19} strokeWidth={1.8} /></span>
-          <span className="brand-name">News<span>Signal</span></span>
+          <span className="brand-name">News<span className="brand-signal">Signal</span></span>
         </Link>
 
         <button
@@ -57,7 +56,6 @@ export function Navbar({ theme, onToggleTheme, onOpenAuth, onLogout }) {
                   <ChevronDown size={15} />
                 </summary>
                 <div className="profile-dropdown">
-                  <span className="dropdown-label">ACCOUNT</span>
                   <strong className="dropdown-name">{user.displayName || user.email?.split('@')[0] || user.email}</strong>
                   <span className="dropdown-email">{user.email}</span>
                   <Link to="/settings" onClick={closeMobile}><Settings size={16} /> Settings</Link>

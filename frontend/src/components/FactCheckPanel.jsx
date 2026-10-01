@@ -1,4 +1,4 @@
-import { ArrowUpRight, LockKeyhole, Sparkles } from 'lucide-react';
+import { ArrowUpRight, LockKeyhole } from 'lucide-react';
 
 export function FactCheckPanel({ articleText, result, loading, onFactCheck, onRequestLogin, user }) {
   const hasText = typeof articleText === 'string' && articleText.trim().length > 0;
@@ -12,7 +12,7 @@ export function FactCheckPanel({ articleText, result, loading, onFactCheck, onRe
   return (
     <section className="fact-check-panel" aria-live="polite" aria-labelledby="fact-check-title">
       <div className="fact-check-header">
-        <div className="fact-check-title-wrap"><span className="fact-check-icon"><Sparkles size={16} /></span><div><span className="section-kicker">LIMITED CONTEXT</span><h3 id="fact-check-title">AI fact-check</h3></div></div>
+        <div className="fact-check-title-wrap"><h3 id="fact-check-title">AI fact-check</h3><p className="fact-check-scope">Limited context</p></div>
         <button
           type="button"
           className="button button-outline"
@@ -20,7 +20,7 @@ export function FactCheckPanel({ articleText, result, loading, onFactCheck, onRe
           disabled={!hasText || loading}
           title={user ? 'Compare with available related news context' : 'Sign in to use AI fact-checking'}
         >
-          {user ? (loading ? 'Checking…' : '✦ Fact-check article') : <><LockKeyhole size={15} /> Sign in to fact-check</>}
+          {user ? (loading ? 'Checking…' : 'Fact-check article') : <><LockKeyhole size={15} /> Sign in to fact-check</>}
         </button>
       </div>
 
@@ -47,8 +47,8 @@ export function FactCheckPanel({ articleText, result, loading, onFactCheck, onRe
               <ul>
                 {result.sources.map((source, index) => (
                   <li key={`${source.url || source.title || index}-${index}`}>
-                    <strong>{source.title || 'News source'}</strong> — {source.source || 'Unknown source'}
-                    {source.url ? <a href={source.url} target="_blank" rel="noreferrer" aria-label={`Read source: ${source.title || source.source || 'news article'}`}><ArrowUpRight size={14} /> Source</a> : null}
+                    <strong>{source.title || 'News source'}</strong> <span className="source-name">{source.source || 'Unknown source'}</span>
+                    {source.url ? <a href={source.url} target="_blank" rel="noreferrer" aria-label={`Read source: ${source.title || source.source || 'news article'}`}>Source <ArrowUpRight size={14} /></a> : null}
                   </li>
                 ))}
               </ul>

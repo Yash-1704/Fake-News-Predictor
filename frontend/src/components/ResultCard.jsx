@@ -6,7 +6,7 @@ export function ResultCard({ result }) {
     <section className="prediction-result" aria-labelledby="prediction-result-title" aria-live="polite">
       <div className="result-topline">
         <div>
-          <span className="result-eyebrow">MODEL PREDICTION</span>
+          <span className="result-eyebrow">Model prediction</span>
           <h2 className={`result-verdict ${isFake ? 'result-fake' : 'result-real'}`} id="prediction-result-title">{result.label}</h2>
         </div>
         <div className="result-score">
@@ -25,7 +25,7 @@ export function ResultCard({ result }) {
       </div>
       <div className="result-foot">
         <p className="disclaimer-text">{result.disclaimer} The score is uncalibrated and does not establish truth.</p>
-        <span className="model-version">MODEL {result.model_version}</span>
+        <span className="model-version">Model {result.model_version}</span>
       </div>
     </section>
   );

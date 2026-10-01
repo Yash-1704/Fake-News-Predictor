@@ -1,3 +1,5 @@
+import { CircleAlert } from 'lucide-react';
+
 export function ErrorBanner({ message }) {
   const display =
     message && (message.includes('Failed to fetch') || message.includes('NetworkError') || message.includes('502') || message.includes('503'))
@@ -6,7 +8,7 @@ export function ErrorBanner({ message }) {
 
   return (
     <div className="error-banner" role="alert" aria-live="assertive">
-      <span className="error-icon">✕</span>
+      <CircleAlert size={18} aria-hidden="true" />
       <span>{display}</span>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BellRing, CircleCheck, Mail, ShieldCheck } from 'lucide-react';
+import { CircleCheck } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 import { ProfileAvatar } from '../components/ProfileAvatar';
 
@@ -54,13 +54,13 @@ export function SettingsPage() {
   return (
     <main className="page-shell content-page settings-page">
       <header className="page-heading">
-        <span className="section-kicker">YOUR ACCOUNT <span>04</span></span>
         <h1>Settings</h1>
         <p>Manage the account details and email preference supported by this project.</p>
       </header>
 
       <section className="settings-section">
-        <div className="settings-section-heading"><ShieldCheck size={18} /><div><h2>Account</h2><p>Your signed-in account</p></div></div>
+        <div className="settings-section-heading"><h2>Account</h2><p>Your signed-in account</p></div>
+        <div className="settings-body">
         <div className="setting-row account-row"><span>Email address</span><strong>{user?.email}</strong></div>
         <form className="profile-edit-form" onSubmit={handleProfileSubmit}>
           <div className="profile-edit-heading">
@@ -75,17 +75,20 @@ export function SettingsPage() {
           {profileSaved && <p className="settings-feedback success" role="status"><CircleCheck size={15} /> Profile saved.</p>}
           <button className="button button-outline profile-save" type="submit" disabled={profileSaving || !displayName.trim()}>{profileSaving ? 'Saving…' : 'Save profile'}</button>
         </form>
+        </div>
       </section>
 
       <section className="settings-section">
-        <div className="settings-section-heading"><BellRing size={18} /><div><h2>Email digest</h2><p>Choose whether to receive the existing weekly digest.</p></div></div>
+        <div className="settings-section-heading"><h2>Email digest</h2><p>Choose whether to receive the existing weekly digest.</p></div>
+        <div className="settings-body">
         <label className="setting-row preference-row" htmlFor="weekly-digest">
-          <span className="setting-copy"><Mail size={18} /><span><strong>Weekly most-checked articles</strong><small>One email with the most-checked articles from the past week.</small></span></span>
+          <span className="setting-copy"><span><strong>Weekly most-checked articles</strong><small>One email with the most-checked articles from the past week.</small></span></span>
           <input id="weekly-digest" type="checkbox" checked={enabled} onChange={handleDigestChange} disabled={saving} />
         </label>
         {saving && <p className="settings-feedback" role="status">Saving preference…</p>}
         {saved && <p className="settings-feedback success" role="status"><CircleCheck size={15} /> Preference saved.</p>}
         {error && <p className="settings-feedback error" role="alert">{error}</p>}
+        </div>
       </section>
 
       <p className="settings-footnote">Password reset and account deletion are not currently available.</p>

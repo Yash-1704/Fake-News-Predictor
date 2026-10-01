@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
-import { ArrowUpRight, CircleAlert } from 'lucide-react';
+import { CircleAlert } from 'lucide-react';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/useAuth';
 import { AuthModal } from './components/AuthModal';
@@ -15,9 +15,9 @@ import './styles.css';
 function NotFoundPage() {
   return (
     <main className="page-shell content-page not-found-page">
-      <span className="section-kicker">PAGE NOT FOUND</span>
+      <p className="meta-label">Page not found</p>
       <h1>This page isn't in the feed.</h1>
-      <Link className="button button-primary" to="/">Return to analysis <ArrowUpRight size={16} /></Link>
+      <Link className="button button-primary" to="/">Return to analysis</Link>
     </main>
   );
 }
@@ -65,9 +65,9 @@ function AppShell() {
       </Routes>
 
       <footer className="site-footer page-shell">
-        <Link to="/" className="footer-brand">NewsSignal <span>·</span> Text-pattern analysis</Link>
+        <Link to="/" className="footer-brand">NewsSignal<span>Text-pattern analysis</span></Link>
         <p>AI outputs are limited assessments, not evidence of truth.</p>
-        <Link to="/about">How it works <ArrowUpRight size={14} /></Link>
+        <Link to="/about" className="footer-link">How it works</Link>
       </footer>
 
       {authModal && (

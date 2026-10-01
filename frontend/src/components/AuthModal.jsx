@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LockKeyhole, LogIn, UserPlus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 import { ProfileAvatar } from './ProfileAvatar';
 
@@ -46,7 +46,6 @@ export function AuthModal({ initialMode = 'login', onClose, onAuthenticated }) {
         <button className="icon-button modal-close" type="button" onClick={onClose} disabled={loading} aria-label="Close sign-in dialog">
           <X size={19} />
         </button>
-        <span className="modal-kicker"><LockKeyhole size={14} /> YOUR READING SPACE</span>
         <h2 id="auth-title">{isRegister ? 'Create an account' : 'Welcome back'}</h2>
         <p className="modal-copy">
           {isRegister ? 'Sign in to unlock AI fact-checking and your weekly digest settings.' : 'Sign in to continue with AI fact-checking and your account settings.'}
@@ -102,7 +101,6 @@ export function AuthModal({ initialMode = 'login', onClose, onAuthenticated }) {
           />
           {error && <p className="form-error" role="alert">{error}</p>}
           <button className="button button-primary auth-submit" type="submit" disabled={loading}>
-            {isRegister ? <UserPlus size={17} /> : <LogIn size={17} />}
             {loading ? 'Please wait…' : isRegister ? 'Create account' : 'Sign in'}
           </button>
         </form>
