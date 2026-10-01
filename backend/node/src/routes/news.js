@@ -1,6 +1,6 @@
 const express = require("express");
 const NewsItem = require("../models/NewsItem");
-const { fetchTopHeadlines } = require("../services/newsApiClient");
+const { searchArticles } = require("../services/newsApiClient");
 
 const router = express.Router();
 
@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
 
     // Why: only miss-driven topic lookups hit GNews once; cached stories are reused for everyone.
     try {
-      const fetched = await fetchTopHeadlines(topic);
+      const fetched = await searchArticles(topic);
       const savedItems = [];
 
       for (const article of fetched) {
@@ -53,7 +53,7 @@ router.get("/", async (req, res) => {
       });
     } catch (gnewsError) {
       console.error("Topic-specific GNews lookup failed:", gnewsError.message);
-      return res.json({ items: cachedItems });
+      return res.status(502).json({ error: "Could not search headlines right now." });
     }
   } catch (error) {
     console.error("News feed request failed:", error.message);

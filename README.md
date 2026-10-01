@@ -178,9 +178,11 @@ The baseline's strongest weights include publisher markers such as `reuters`, `v
 
 ## UI Screenshots
 
-![Article input screen](Documents/figures/ui-home.png)
+The current interface separates article-pattern analysis from its optional, limited-context fact-check.
 
-![Example prediction result](Documents/figures/ui-result.png)
+![Current NewsSignal home and article analyzer](Documents/figures/ui-home.png)
+
+![Live sample prediction with model score and disclaimer](Documents/figures/ui-result.png)
 
 ## Limitations
 

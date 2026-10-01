@@ -56,7 +56,7 @@ export default function NewsFeed({ onOpenAuth }) {
 
       {status === 'loading' && <div className="loading-line" role="status"><LoaderCircle size={17} className="spin-icon" /> Loading headlines…</div>}
       {status === 'error' && <div className="inline-error" role="alert"><Newspaper size={18} /><div><strong>Headlines couldn't load.</strong><p>{error}</p><button className="text-button" type="button" onClick={() => setRefreshKey((value) => value + 1)}><RefreshCw size={14} /> Try again</button></div></div>}
-      {status === 'success' && items.length === 0 && <div className="empty-state"><Newspaper size={22} /><h3>No cached headlines found</h3><p>Try another topic or check back after the news cache refreshes.</p></div>}
+      {status === 'success' && items.length === 0 && <div className="empty-state"><Newspaper size={22} /><h3>No headlines found</h3><p>Try a different topic.</p></div>}
       {status === 'success' && items.length > 0 && (
         <div className="news-list">{items.map((item, index) => <NewsArticleCard key={item.url || `${item.title}-${index}`} article={item} index={index} />)}</div>
       )}

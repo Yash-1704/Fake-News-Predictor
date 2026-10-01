@@ -49,7 +49,12 @@ export function getNews(topic = '', options = {}) {
 export async function getCurrentUser() {
   const data = await request('/auth/me', { method: 'GET' }, { allowFailure: true });
   if (!data || data.user === null) return null;
-  return data.email ? { email: data.email, emailOptIn: data.emailOptIn ?? true } : null;
+  return data.email ? {
+    email: data.email,
+    displayName: data.displayName || '',
+    profileImageUrl: data.profileImageUrl || '',
+    emailOptIn: data.emailOptIn ?? true,
+  } : null;
 }
 
 export async function updateEmailOptIn(emailOptIn) {
@@ -64,6 +69,13 @@ export async function updateEmailOptIn(emailOptIn) {
   };
 }
 
+export async function updateProfile(profile) {
+  return request('/auth/profile', {
+    method: 'PATCH',
+    body: JSON.stringify(profile),
+  });
+}
+
 export async function loginUser(email, password) {
   return request('/auth/login', {
     method: 'POST',
@@ -71,10 +83,10 @@ export async function loginUser(email, password) {
   });
 }
 
-export async function registerUser(email, password) {
+export async function registerUser(email, password, profile = {}) {
   return request('/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, ...profile }),
   });
 }
 

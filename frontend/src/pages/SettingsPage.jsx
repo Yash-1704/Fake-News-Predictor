@@ -1,14 +1,37 @@
 import { useState } from 'react';
 import { BellRing, CircleCheck, Mail, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
+import { ProfileAvatar } from '../components/ProfileAvatar';
 
 export function SettingsPage() {
-  const { user, setEmailOptIn } = useAuth();
+  const { user, setEmailOptIn, saveProfile } = useAuth();
+  const [displayName, setDisplayName] = useState(user?.displayName || user?.email?.split('@')[0] || '');
+  const [profileImageUrl, setProfileImageUrl] = useState(user?.profileImageUrl || '');
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileError, setProfileError] = useState('');
+  const [profileSaved, setProfileSaved] = useState(false);
   const [pendingPreference, setPendingPreference] = useState(null);
   const enabled = pendingPreference ?? Boolean(user?.emailOptIn);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
+
+  async function handleProfileSubmit(event) {
+    event.preventDefault();
+    setProfileSaving(true);
+    setProfileSaved(false);
+    setProfileError('');
+    try {
+      const updated = await saveProfile({ displayName: displayName.trim(), profileImageUrl: profileImageUrl.trim() });
+      setDisplayName(updated.displayName || '');
+      setProfileImageUrl(updated.profileImageUrl || '');
+      setProfileSaved(true);
+    } catch (requestError) {
+      setProfileError(requestError.message || 'Could not save your profile.');
+    } finally {
+      setProfileSaving(false);
+    }
+  }
 
   async function handleDigestChange(event) {
     const nextValue = event.target.checked;
@@ -39,6 +62,19 @@ export function SettingsPage() {
       <section className="settings-section">
         <div className="settings-section-heading"><ShieldCheck size={18} /><div><h2>Account</h2><p>Your signed-in account</p></div></div>
         <div className="setting-row account-row"><span>Email address</span><strong>{user?.email}</strong></div>
+        <form className="profile-edit-form" onSubmit={handleProfileSubmit}>
+          <div className="profile-edit-heading">
+            <ProfileAvatar displayName={displayName} email={user?.email} imageUrl={profileImageUrl} size="large" />
+            <div><strong>Profile details</strong><small>Name and picture shown in your account menu.</small></div>
+          </div>
+          <label htmlFor="profile-display-name">Display name</label>
+          <input id="profile-display-name" type="text" value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={60} required />
+          <label htmlFor="profile-image-url">Profile picture URL</label>
+          <input id="profile-image-url" type="url" value={profileImageUrl} onChange={(event) => setProfileImageUrl(event.target.value)} maxLength={500} placeholder="https://example.com/photo.jpg" />
+          {profileError && <p className="settings-feedback error" role="alert">{profileError}</p>}
+          {profileSaved && <p className="settings-feedback success" role="status"><CircleCheck size={15} /> Profile saved.</p>}
+          <button className="button button-outline profile-save" type="submit" disabled={profileSaving || !displayName.trim()}>{profileSaving ? 'Saving…' : 'Save profile'}</button>
+        </form>
       </section>
 
       <section className="settings-section">
@@ -52,7 +88,7 @@ export function SettingsPage() {
         {error && <p className="settings-feedback error" role="alert">{error}</p>}
       </section>
 
-      <p className="settings-footnote">Profile editing, password reset, and account deletion are not currently available.</p>
+      <p className="settings-footnote">Password reset and account deletion are not currently available.</p>
     </main>
   );
 }

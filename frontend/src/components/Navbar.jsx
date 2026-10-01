@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { ChevronDown, FileText, LogOut, Menu, Moon, Settings, Sun, X } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
+import { ProfileAvatar } from './ProfileAvatar';
 
 export function Navbar({ theme, onToggleTheme, onOpenAuth, onLogout }) {
   const { user, loading } = useAuth();
@@ -51,12 +52,13 @@ export function Navbar({ theme, onToggleTheme, onOpenAuth, onLogout }) {
             ) : user ? (
               <details className="profile-menu">
                 <summary className="profile-trigger">
-                  <span className="avatar-mark" aria-hidden="true">{user.email?.slice(0, 1).toUpperCase()}</span>
-                  <span className="profile-email">{user.email}</span>
+                  <ProfileAvatar displayName={user.displayName} email={user.email} imageUrl={user.profileImageUrl} size="small" />
+                  <span className="profile-email">{user.displayName || user.email?.split('@')[0] || user.email}</span>
                   <ChevronDown size={15} />
                 </summary>
                 <div className="profile-dropdown">
                   <span className="dropdown-label">ACCOUNT</span>
+                  <strong className="dropdown-name">{user.displayName || user.email?.split('@')[0] || user.email}</strong>
                   <span className="dropdown-email">{user.email}</span>
                   <Link to="/settings" onClick={closeMobile}><Settings size={16} /> Settings</Link>
                   <button type="button" onClick={() => { closeMobile(); onLogout(); }}><LogOut size={16} /> Sign out</button>

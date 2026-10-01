@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { LockKeyhole, LogIn, UserPlus, X } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
+import { ProfileAvatar } from './ProfileAvatar';
 
 export function AuthModal({ initialMode = 'login', onClose, onAuthenticated }) {
   const { login, register } = useAuth();
   const [mode, setMode] = useState(initialMode);
+  const [displayName, setDisplayName] = useState('');
+  const [profileImageUrl, setProfileImageUrl] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,7 +30,7 @@ export function AuthModal({ initialMode = 'login', onClose, onAuthenticated }) {
 
     try {
       const user = isRegister
-        ? await register(email.trim(), password)
+        ? await register(email.trim(), password, { displayName: displayName.trim(), profileImageUrl: profileImageUrl.trim() })
         : await login(email.trim(), password);
       onAuthenticated(user);
     } catch (requestError) {
@@ -50,6 +53,34 @@ export function AuthModal({ initialMode = 'login', onClose, onAuthenticated }) {
         </p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
+          {isRegister && (
+            <>
+              <label htmlFor="auth-display-name">Name</label>
+              <input
+                id="auth-display-name"
+                type="text"
+                autoComplete="name"
+                maxLength={60}
+                value={displayName}
+                onChange={(event) => setDisplayName(event.target.value)}
+                required
+              />
+              <label htmlFor="auth-profile-image">Profile picture URL <span>(optional)</span></label>
+              <input
+                id="auth-profile-image"
+                type="url"
+                autoComplete="url"
+                maxLength={500}
+                value={profileImageUrl}
+                onChange={(event) => setProfileImageUrl(event.target.value)}
+                placeholder="https://example.com/photo.jpg"
+              />
+              <div className="auth-avatar-preview">
+                <ProfileAvatar displayName={displayName} email={email} imageUrl={profileImageUrl} />
+                <span>{profileImageUrl.trim() ? 'Preview' : 'Your initials appear until you add a picture URL.'}</span>
+              </div>
+            </>
+          )}
           <label htmlFor="auth-email">Email</label>
           <input
             id="auth-email"

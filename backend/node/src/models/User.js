@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   passwordHash: { type: String, required: true },
+  displayName: { type: String, trim: true, maxlength: 60, default: "" },
+  profileImageUrl: { type: String, trim: true, maxlength: 500, default: "" },
   emailOptIn: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
 });

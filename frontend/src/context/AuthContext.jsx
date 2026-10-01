@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AuthContext } from './authContext';
-import { getCurrentUser, loginUser, logoutUser, registerUser, updateEmailOptIn } from '../api';
+import { getCurrentUser, loginUser, logoutUser, registerUser, updateEmailOptIn, updateProfile } from '../api';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -34,8 +34,8 @@ export function AuthProvider({ children }) {
     return refreshUser();
   }
 
-  async function register(email, password) {
-    await registerUser(email, password);
+  async function register(email, password, profile) {
+    await registerUser(email, password, profile);
     return refreshUser();
   }
 
@@ -50,8 +50,14 @@ export function AuthProvider({ children }) {
     return updatedUser;
   }
 
+  async function saveProfile(profile) {
+    const updatedUser = await updateProfile(profile);
+    setUser((current) => ({ ...(current || {}), ...updatedUser }));
+    return updatedUser;
+  }
+
   const value = useMemo(
-    () => ({ user, loading, login, register, logout, refreshUser, setEmailOptIn }),
+    () => ({ user, loading, login, register, logout, refreshUser, setEmailOptIn, saveProfile }),
     [user, loading],
   );
 

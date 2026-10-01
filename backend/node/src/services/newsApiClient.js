@@ -12,17 +12,15 @@ function normalizeArticle(article, topic = "") {
   };
 }
 
-async function fetchTopHeadlines(topic = "") {
+async function fetchArticles(endpoint, params, topic) {
   if (!config.gnewsApiKey) {
-    return [];
+    throw new Error("GNews API key is not configured");
   }
 
-  const url = new URL("https://gnews.io/api/v4/top-headlines");
+  const url = new URL(`https://gnews.io/api/v4/${endpoint}`);
   url.searchParams.set("lang", "en");
   url.searchParams.set("apikey", config.gnewsApiKey);
-  if (topic) {
-    url.searchParams.set("q", topic);
-  }
+  for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -33,4 +31,13 @@ async function fetchTopHeadlines(topic = "") {
   return Array.isArray(data.articles) ? data.articles.map((article) => normalizeArticle(article, topic)) : [];
 }
 
-module.exports = { fetchTopHeadlines, normalizeArticle };
+function fetchTopHeadlines(topic = "") {
+  return fetchArticles("top-headlines", topic ? { q: topic } : {}, topic);
+}
+
+function searchArticles(query) {
+  const topic = String(query || "").trim();
+  return topic ? fetchArticles("search", { q: topic }, topic) : Promise.resolve([]);
+}
+
+module.exports = { fetchTopHeadlines, searchArticles, normalizeArticle };

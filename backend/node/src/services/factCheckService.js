@@ -3,7 +3,7 @@ const { Check } = require("../models/Check");
 const NewsItem = require("../models/NewsItem");
 const { sha256 } = require("../utils/hash");
 const { chat } = require("./groqClient");
-const { fetchTopHeadlines } = require("./newsApiClient");
+const { searchArticles } = require("./newsApiClient");
 
 const STOP_WORDS = new Set([
   "a",
@@ -12,8 +12,10 @@ const STOP_WORDS = new Set([
   "are",
   "as",
   "at",
+  "about",
   "be",
   "by",
+  "college",
   "for",
   "from",
   "he",
@@ -22,6 +24,8 @@ const STOP_WORDS = new Set([
   "i",
   "in",
   "into",
+  "incident",
+  "incidents",
   "is",
   "it",
   "its",
@@ -108,9 +112,10 @@ function parseVerdict(raw, context = []) {
 async function factCheck(text) {
   const cleanText = typeof text === "string" ? text.trim() : "";
   const textHash = sha256(cleanText);
+  const topic = extractTopic(cleanText);
 
   const existing = await Check.findOne({ textHash }).lean();
-  if (existing?.factCheck) {
+  if (existing?.factCheck?.contextTopic === topic) {
     await Check.findOneAndUpdate(
       { textHash },
       {
@@ -120,10 +125,11 @@ async function factCheck(text) {
       { new: true },
     );
 
-    return { ...existing.factCheck, cached: true };
+    const cachedResult = { ...existing.factCheck };
+    delete cachedResult.contextTopic;
+    return { ...cachedResult, cached: true };
   }
 
-  const topic = extractTopic(cleanText);
   let context = await NewsItem.find({
     $or: [
       { title: { $regex: new RegExp(topic.split(" ").slice(0, 4).join("|"), "i") } },
@@ -136,7 +142,7 @@ async function factCheck(text) {
 
   if (context.length === 0) {
     try {
-      context = await fetchTopHeadlines(topic);
+      context = await searchArticles(topic);
     } catch (error) {
       console.error("GNews fallback failed for fact-check context:", error.message);
       context = [];
@@ -150,6 +156,7 @@ async function factCheck(text) {
   const prompt = `You are a careful fact-checking assistant. Given an ARTICLE and some RELATED NEWS ITEMS retrieved from a news API, assess the article.
 Only use the related items and well-established general knowledge — do not invent facts or sources. If the related items don't cover the claim, say
 "unverifiable" rather than guessing.
+Treat reports of allegations, denials, and investigations as evidence that those statements were reported, not proof that the underlying claim is true or false. Cite only items directly relevant to the article's central claim.
 
 ARTICLE:
 ${cleanText.slice(0, 3000)}
@@ -178,6 +185,7 @@ SOURCES_USED: <comma-separated numbers from the list above, or "none">`;
   const parsed = parseVerdict(raw, context);
   const payload = {
     ...parsed,
+    contextTopic: topic,
     model: config.groqModel,
     checkedAt: new Date(),
   };
